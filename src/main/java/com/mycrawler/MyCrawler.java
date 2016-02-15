@@ -3,6 +3,8 @@
  */
 package com.mycrawler;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -35,7 +37,7 @@ public class MyCrawler extends WebCrawler {
     static String includeHost;
 
     /**
-     * the map of urls we have visited so far
+     * the list of urls we have visited so far
      */
     static List<JsonObject> visitedUrls;
 
@@ -58,6 +60,12 @@ public class MyCrawler extends WebCrawler {
             .compile("([^\\s]+(\\.(?i)("
                     + "css|js|bmp|gif|jpe?g|png|tiff?|ico|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf|rm|smil|wmv|swf|wma|zip|rar|gz|jar|woff"
                     + "))[^\\s]*$)");
+
+    /**
+     * Date-format for zoned ISO8601-style date-times.
+     */
+    private final static SimpleDateFormat sdf = new SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'XXX");
 
     /**
      * @return the host to be included in the crawl
@@ -162,6 +170,7 @@ public class MyCrawler extends WebCrawler {
         synchronized (visitedUrls) {
             final JsonObject json = new JsonObject();
             json.add("url", new JsonPrimitive(url.getURL()));
+            json.add("datetime", new JsonPrimitive(sdf.format(new Date())));
             json.add("status", new JsonPrimitive(statusCode));
             json.add("description", new JsonPrimitive(statusDescription));
             visitedUrls.add(json);

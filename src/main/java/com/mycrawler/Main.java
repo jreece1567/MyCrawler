@@ -6,6 +6,7 @@ package com.mycrawler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
@@ -181,13 +182,22 @@ public class Main {
             System.out.println("Elapsed: " + (stop - start) + "ms");
 
             // write the crawl-results for each url to a file in JSON format
-            final String filename = config.getRunConfig().getOutputFolder()
-                    + "/" + "crawled_" + System.currentTimeMillis() + ".json";
-            FileUtils.writeFileFromString(filename,
-                    gson.toJson(MyCrawler.getVisitedUrls()));
+            final String filename = summarizeCrawl(config);
 
             new SendEmail(config, filename).doSendEmail();
         }
+    }
+
+    private String summarizeCrawl(final MyCrawlerConfig config) {
+
+        // write the crawl-results for each url to a file in JSON format
+        final String filename = config.getRunConfig().getOutputFolder() + "/"
+                + "crawled_" + System.currentTimeMillis() + ".json";
+
+        FileUtils.writeFileFromString(filename,
+                gson.toJson(MyCrawler.getVisitedUrls()));
+
+        return filename;
     }
 
     /**
@@ -199,18 +209,31 @@ public class Main {
         if (args.length > 0) {
 
             // first argument is the YML config filename
-            final Yaml yaml = new Yaml();
             try {
 
                 final InputStream in = Files.newInputStream(Paths.get(args[0]));
-                final MyCrawlerConfig config = yaml.loadAs(in,
+                final MyCrawlerConfig config = new Yaml().loadAs(in,
                         MyCrawlerConfig.class);
 
                 System.out.println("Configuration:\n" + gson.toJson(config)
                         + "\n-----------------------------------");
 
+                // try to write the data we have if we get shut down before
+                // normal completion
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    @Override
+                    public void run() {
+                        summarizeCrawl(config);
+                    }
+                });
+
                 // run with configured values
                 runCrawler(config);
+
+            } catch (final NoSuchFileException nsfe) {
+
+                System.err.println("Configuration file [" + args[0]
+                        + "] was not found.");
 
             } catch (final IOException e) {
 
