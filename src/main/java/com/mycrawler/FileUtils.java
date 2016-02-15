@@ -100,7 +100,7 @@ public class FileUtils {
     }
 
     /**
-     * @param url
+     * @param uri
      *            the URL of the file to read
      * @return the contents of the file, as a String
      */
@@ -181,7 +181,7 @@ public class FileUtils {
     /**
      * @param filename
      *            the name of the file to be written
-     * @param lines
+     * @param string 
      *            a String to be written to the file
      */
     public static void writeFileFromString(final String filename,
@@ -190,9 +190,9 @@ public class FileUtils {
     }
 
     /**
-     * @param filename
-     *            the name of the file to be written
-     * @param lines
+     * @param file
+     *            the File to be written
+     * @param string 
      *            a String to be written to the file
      */
     public static void writeFileFromString(final File file, final String string) {
