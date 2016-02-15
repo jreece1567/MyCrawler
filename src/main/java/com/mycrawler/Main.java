@@ -28,7 +28,7 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 /**
- * @author jreece
+ * @author jreece@us.westfield.com
  *
  */
 public class Main {

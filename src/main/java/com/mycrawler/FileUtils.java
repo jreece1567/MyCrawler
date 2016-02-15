@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * @author jreece
+ * @author jreece@us.westfield.com
  *
  */
 public class FileUtils {

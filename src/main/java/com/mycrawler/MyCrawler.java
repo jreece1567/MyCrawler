@@ -14,7 +14,7 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
- * @author jreece
+ * @author jreece@us.westfield.com
  *
  */
 public class MyCrawler extends WebCrawler {

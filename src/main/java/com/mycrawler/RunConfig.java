@@ -6,7 +6,7 @@ package com.mycrawler;
 import java.util.List;
 
 /**
- * @author jreece
+ * @author jreece@us.westfield.com
  *
  */
 public class RunConfig {

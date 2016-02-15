@@ -7,7 +7,7 @@ import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 
 /**
- * @author jreece
+ * @author jreece@us.westfield.com
  *
  */
 public class MyCrawlerConfig {
