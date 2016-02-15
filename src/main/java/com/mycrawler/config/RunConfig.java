@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.mycrawler;
+package com.mycrawler.config;
 
 import java.util.List;
 

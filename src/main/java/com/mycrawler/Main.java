@@ -20,6 +20,7 @@ import org.yaml.snakeyaml.Yaml;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.mycrawler.config.MyCrawlerConfig;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
@@ -42,8 +43,8 @@ public class Main {
     /**
      * Construct a CrawlController
      *
-     * @param crawlStorageFolder
-     *            the folder that the results will be written to
+     * @param runConfig
+     *            the configuration parameters
      * @return the configured CrawlController
      *
      * @see edu.uci.ics.crawler4j.crawler.CrawlController
@@ -136,6 +137,10 @@ public class Main {
                 config.getRunConfig().getOutputFolder() + "/"
                         + System.currentTimeMillis());
 
+        config.getCrawlConfig().setCrawlStorageFolder(
+                config.getCrawlConfig().getCrawlStorageFolder() + "/"
+                        + System.currentTimeMillis());
+
         // set up log4j/slf4j
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.ERROR);
@@ -177,7 +182,7 @@ public class Main {
 
             // write the crawl-results for each url to a file in JSON format
             final String filename = config.getRunConfig().getOutputFolder()
-                    + "crawled_" + System.currentTimeMillis() + ".json";
+                    + "/" + "crawled_" + System.currentTimeMillis() + ".json";
             FileUtils.writeFileFromString(filename,
                     gson.toJson(MyCrawler.getVisitedUrls()));
 

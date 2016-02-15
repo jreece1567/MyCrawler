@@ -18,6 +18,8 @@ import javax.mail.internet.MimeMultipart;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mycrawler.config.EmailConfig;
+import com.mycrawler.config.MyCrawlerConfig;
 
 /**
  * @author jnatalini@us.westfield.com

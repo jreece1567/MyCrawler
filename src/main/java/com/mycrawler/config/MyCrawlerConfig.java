@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.mycrawler;
+package com.mycrawler.config;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
