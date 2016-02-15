@@ -123,6 +123,12 @@ public class Main {
         return null;
     }
 
+    /**
+     * Start the crawler.
+     *
+     * @param config
+     *            the configuration
+     */
     private void runCrawler(final MyCrawlerConfig config) {
 
         // set empty arrays if needed
@@ -176,28 +182,44 @@ public class Main {
 
             // print summary stats
             System.out.println("Start: " + new Date(start));
-            System.out.println("Total pages: " + MyCrawler.getTotalPages());
-            System.out.println("Total errors: " + MyCrawler.getTotalErrors());
-            System.out.println("Stop: " + new Date(stop));
+            System.out.println(" Stop: " + new Date(stop));
             System.out.println("Elapsed: " + (stop - start) + "ms");
 
-            // write the crawl-results for each url to a file in JSON format
-            final String filename = summarizeCrawl(config);
-
-            new SendEmail(config, filename).doSendEmail();
         }
     }
 
-    private String summarizeCrawl(final MyCrawlerConfig config) {
+    /**
+     * @param config
+     *            the configuration
+     * @return the path-and-name of the file to contain the JSON-format
+     *         crawl-results.
+     */
+    private String getJsonFilename(final MyCrawlerConfig config) {
+
+        return config.getRunConfig().getOutputFolder() + "/" + "crawled.json";
+    }
+
+    /**
+     * Write the JSON-format crawl-results to a file, and send email if email is
+     * configured.
+     *
+     * @param config
+     *            the configuration
+     */
+    private void summarizeCrawl(final MyCrawlerConfig config) {
+
+        System.out.println("Total pages: " + MyCrawler.getTotalPages());
+        System.out.println("Total errors: " + MyCrawler.getTotalErrors());
+
+        final String filename = getJsonFilename(config);
 
         // write the crawl-results for each url to a file in JSON format
-        final String filename = config.getRunConfig().getOutputFolder() + "/"
-                + "crawled_" + System.currentTimeMillis() + ".json";
-
         FileUtils.writeFileFromString(filename,
                 gson.toJson(MyCrawler.getVisitedUrls()));
 
-        return filename;
+        // send the crawl-results out via email
+        new SendEmail(config, filename).doSendEmail();
+
     }
 
     /**
@@ -218,8 +240,7 @@ public class Main {
                 System.out.println("Configuration:\n" + gson.toJson(config)
                         + "\n-----------------------------------");
 
-                // try to write the data we have if we get shut down before
-                // normal completion
+                // write the data we have when the program ends
                 Runtime.getRuntime().addShutdownHook(new Thread() {
                     @Override
                     public void run() {

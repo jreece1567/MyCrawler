@@ -167,12 +167,15 @@ public class MyCrawler extends WebCrawler {
      */
     private void recordVisit(final WebURL url, final int statusCode,
             final String statusDescription) {
+
         synchronized (visitedUrls) {
+
             final JsonObject json = new JsonObject();
             json.add("url", new JsonPrimitive(url.getURL()));
             json.add("datetime", new JsonPrimitive(sdf.format(new Date())));
             json.add("status", new JsonPrimitive(statusCode));
             json.add("description", new JsonPrimitive(statusDescription));
+
             visitedUrls.add(json);
         }
     }
