@@ -15,7 +15,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jreece@us.westfield.com
@@ -23,8 +25,10 @@ import java.util.logging.Logger;
  */
 public class FileUtils {
 
-    protected static Logger LOGGER = Logger
-            .getLogger(FileUtils.class.getName());
+    /**
+     * The logger
+     */
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     /**
      * @param filename
@@ -138,7 +142,7 @@ public class FileUtils {
                 throw new IOException(sb.toString());
             }
         } catch (final IOException e) {
-            LOGGER.severe("Response '" + e.getLocalizedMessage()
+            logger.error("Response '" + e.getLocalizedMessage()
                     + "' when accessing " + uri);
             return null;
         }
@@ -164,7 +168,7 @@ public class FileUtils {
     public static void writeFileFromList(final File file,
             final List<String> lines) {
         try {
-            System.out.println("writing file " + file.getAbsolutePath());
+            logger.info("writing file " + file.getAbsolutePath());
 
             final FileWriter fw = new FileWriter(file);
             final Iterator<String> it = lines.iterator();
@@ -181,7 +185,7 @@ public class FileUtils {
     /**
      * @param filename
      *            the name of the file to be written
-     * @param string 
+     * @param string
      *            a String to be written to the file
      */
     public static void writeFileFromString(final String filename,
@@ -192,12 +196,12 @@ public class FileUtils {
     /**
      * @param file
      *            the File to be written
-     * @param string 
+     * @param string
      *            a String to be written to the file
      */
     public static void writeFileFromString(final File file, final String string) {
         try {
-            System.out.println("writing file " + file.getAbsolutePath());
+            logger.info("writing file " + file.getAbsolutePath());
 
             final FileWriter fw = new FileWriter(file);
             fw.write(string + "\n");

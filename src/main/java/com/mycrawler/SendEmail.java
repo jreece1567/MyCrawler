@@ -16,10 +16,12 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mycrawler.config.EmailConfig;
-import com.mycrawler.config.MyCrawlerConfig;
 
 /**
  * @author jnatalini@us.westfield.com
@@ -28,12 +30,18 @@ import com.mycrawler.config.MyCrawlerConfig;
 public class SendEmail {
 
     /**
+     * The logger
+     */
+    private static final Logger logger = LoggerFactory
+            .getLogger(SendEmail.class);
+
+    /**
      * A Gson instance
      */
     private final Gson gson = new GsonBuilder().serializeNulls()
             .setPrettyPrinting().create();
 
-    private final EmailConfig emailConfig;
+    private final EmailConfig config;
     private final String filename;
 
     /**
@@ -43,8 +51,8 @@ public class SendEmail {
      * @param filename
      *            the name of the file to be attached to the email message
      */
-    public SendEmail(final MyCrawlerConfig config, final String filename) {
-        this.emailConfig = config.getEmailConfig();
+    public SendEmail(final EmailConfig config, final String filename) {
+        this.config = config;
         this.filename = filename;
     }
 
@@ -53,8 +61,8 @@ public class SendEmail {
      *            the crawler configuration, which contains the email
      *            configuration
      */
-    public SendEmail(final MyCrawlerConfig config) {
-        this.emailConfig = config.getEmailConfig();
+    public SendEmail(final EmailConfig config) {
+        this.config = config;
         this.filename = null;
     }
 
@@ -65,47 +73,45 @@ public class SendEmail {
     public void doSendEmail() {
 
         // if there is no 'from' address, there is nothing for us to do
-        if ((emailConfig.getEmailFrom() == null)
-                || (emailConfig.getEmailFrom().trim().length() < 1)) {
-            System.err
-                    .println("No 'from' email address supplied, no email sent.");
+        if ((config.getEmailFrom() == null)
+                || (config.getEmailFrom().trim().length() < 1)) {
+            logger.warn("No 'from' email address supplied, no email sent.");
             return;
         }
 
         // if there are no 'to' addresses, there is nothing for us to do
-        if ((emailConfig.getEmailRecipients() == null)
-                || (emailConfig.getEmailRecipients().size() < 1)) {
-            System.err
-                    .println("No 'to' email addresses supplied, no email sent.");
+        if ((config.getEmailRecipients() == null)
+                || (config.getEmailRecipients().size() < 1)) {
+            logger.warn("No 'to' email addresses supplied, no email sent.");
             return;
         }
 
         // if there is no smtp host specified, there is nothing for us to do
-        if ((emailConfig.getSmtpHost() == null)
-                || (emailConfig.getSmtpHost().trim().length() < 1)) {
-            System.err.println("No SMTP 'host' supplied, no email sent.");
+        if ((config.getSmtpHost() == null)
+                || (config.getSmtpHost().trim().length() < 1)) {
+            logger.warn("No SMTP 'host' supplied, no email sent.");
             return;
         }
 
         // if there is no smtp port specified, there is nothing for us to do
-        if (emailConfig.getSmtpPort() == null) {
-            System.err.println("No SMTP 'port' supplied, no email sent.");
+        if (config.getSmtpPort() == null) {
+            logger.warn("No SMTP 'port' supplied, no email sent.");
             return;
         }
 
         // Setup mail server
         final Properties props = System.getProperties();
 
-        props.setProperty("mail.smtp.host", emailConfig.getSmtpHost());
+        props.setProperty("mail.smtp.host", config.getSmtpHost());
 
         props.setProperty("mail.smtp.port",
-                String.valueOf(emailConfig.getSmtpPort()));
+                String.valueOf(config.getSmtpPort()));
 
-        if (emailConfig.getSmtpAuth() != null) {
-            props.put("mail.smtp.auth", emailConfig.getSmtpAuth());
+        if (config.getSmtpAuth() != null) {
+            props.put("mail.smtp.auth", config.getSmtpAuth());
         }
-        if (emailConfig.getTlsEnable() != null) {
-            props.put("mail.smtp.starttls.enable", emailConfig.getTlsEnable());
+        if (config.getTlsEnable() != null) {
+            props.put("mail.smtp.starttls.enable", config.getTlsEnable());
         }
 
         // Get the default Session object, configured with our property values.
@@ -116,9 +122,9 @@ public class SendEmail {
             final MimeMessage message = new MimeMessage(session);
 
             // Set From: header field of the header.
-            message.setFrom(new InternetAddress(emailConfig.getEmailFrom()));
+            message.setFrom(new InternetAddress(config.getEmailFrom()));
 
-            for (final String recipient : emailConfig.getEmailRecipients()) {
+            for (final String recipient : config.getEmailRecipients()) {
                 message.addRecipient(Message.RecipientType.TO,
                         new InternetAddress(recipient));
             }
@@ -130,7 +136,7 @@ public class SendEmail {
 
             // Fill the message
             messageBodyPart
-                    .setText("Please see attached file with results. Thank you for using the Westfield WebCrawler!");
+            .setText("Please see attached file with results. Thank you for using the Westfield WebCrawler!");
             if (filename != null) {
 
                 // Create a multipart message
@@ -156,11 +162,12 @@ public class SendEmail {
 
             // Send message
             Transport.send(message);
-            System.out.println("Sent message successfully....");
+            logger.info("Sent message successfully....");
 
         } catch (final MessagingException mex) {
 
-            System.out.println("\nConfiguration:\n" + gson.toJson(emailConfig)
+            logger.error(mex.getMessage());
+            logger.error("\nConfiguration:\n" + gson.toJson(config)
                     + "\n-------------------------\n");
             mex.printStackTrace();
         }
