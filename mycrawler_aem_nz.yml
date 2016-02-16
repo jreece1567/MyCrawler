@@ -1,0 +1,48 @@
+
+runConfig:
+  includeHost: "/www.uat.westfield.co.nz/"
+  numberOfCrawlers: 12
+  seedUrl: "https://www.uat.westfield.co.nz/"
+  outputFolder: "/Users/jreece/tmp"
+  includeUrls:
+  excludeUrls:
+
+crawlConfig:
+  crawlStorageFolder: "/Users/jreece/tmp"
+  resumableCrawling: false
+  maxDepthOfCrawling: -1
+  userAgentString: "crawler4j"
+# defaultHeaders: null
+  politenessDelay: 625
+  includeHttpsPages: true
+  includeBinaryContentInCrawling: false
+  processBinaryContentInCrawling: false
+  maxConnectionsPerHost: 100
+  maxTotalConnections: 100
+  socketTimeout: 20000
+  connectionTimeout: 30000
+  maxOutgoingLinksToFollow: 5000
+  maxDownloadSize: 1048576
+  followRedirects: true
+  onlineTldListUpdate: false
+  shutdownOnEmptyQueue: true
+  proxyHost: null
+  proxyPort: 80
+  proxyUsername: null
+  proxyPassword: null
+# authInfos: null
+
+robotstxtConfig:
+  enabled: true
+  cacheSize: 500
+  userAgentName: "crawler4j"
+
+emailConfig:
+  emailFrom: null 
+  smtpHost: "127.0.0.1"
+  smtpPort: 25
+  smtpAuth:
+  tlsEnable:
+  emailRecipients:
+    - "jnatalini@us.westfield.com"
+
