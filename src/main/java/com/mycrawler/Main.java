@@ -8,9 +8,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.TimeZone;
 
 import org.apache.http.message.BasicHeader;
 import org.apache.log4j.BasicConfigurator;
@@ -40,6 +42,27 @@ public class Main {
      */
     private final Gson gson = new GsonBuilder().serializeNulls()
             .setPrettyPrinting().create();
+
+    /**
+     * Date-format for yyyymmddhhmmsss-style date-times.
+     */
+    private final static SimpleDateFormat sdf = new SimpleDateFormat(
+            "yyyyMMddHHmmssSSS");
+
+    /**
+     * The timestamp of the start of this crawl
+     */
+    private static String fileTimestamp = "";
+
+    /**
+     * The timestamp of the start of the crawl
+     */
+    private static Long crawlStartTime = null;
+
+    /**
+     * The timestamp of the end of the crawl
+     */
+    private static Long crawlEndTime = null;
 
     /**
      * Construct a CrawlController
@@ -139,14 +162,16 @@ public class Main {
             config.getRunConfig().setExcludeUrls(new ArrayList<String>());
         }
 
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        fileTimestamp = sdf.format(new Date());
+
         // update the output folder-name to ensure uniqueness
         config.getRunConfig().setOutputFolder(
-                config.getRunConfig().getOutputFolder() + "/"
-                        + System.currentTimeMillis());
+                config.getRunConfig().getOutputFolder() + "/" + fileTimestamp);
 
         config.getCrawlConfig().setCrawlStorageFolder(
                 config.getCrawlConfig().getCrawlStorageFolder() + "/"
-                        + System.currentTimeMillis());
+                        + fileTimestamp);
 
         // set up log4j/slf4j
         BasicConfigurator.configure();
@@ -167,36 +192,20 @@ public class Main {
             // set the starting url for the crawl
             controller.addSeed(config.getRunConfig().getSeedUrl());
 
-            // / start the clock
-            final long start = System.currentTimeMillis();
-            System.out.println("Start: " + new Date(start));
+            // start the clock
+            crawlStartTime = System.currentTimeMillis();
+            System.out.println("Start: " + new Date(crawlStartTime));
 
-            // start the crawl
+            // start the crawl, wait for it to finish
             controller.start(MyCrawler.class, config.getRunConfig()
                     .getNumberOfCrawlers());
 
+            // shut down the crawler threads
             controller.shutdown();
 
             // stop the clock
-            final long stop = System.currentTimeMillis();
-
-            // print summary stats
-            System.out.println("Start: " + new Date(start));
-            System.out.println(" Stop: " + new Date(stop));
-            System.out.println("Elapsed: " + (stop - start) + "ms");
-
+            crawlEndTime = System.currentTimeMillis();
         }
-    }
-
-    /**
-     * @param config
-     *            the configuration
-     * @return the path-and-name of the file to contain the JSON-format
-     *         crawl-results.
-     */
-    private String getJsonFilename(final MyCrawlerConfig config) {
-
-        return config.getRunConfig().getOutputFolder() + "/" + "crawled.json";
     }
 
     /**
@@ -208,10 +217,21 @@ public class Main {
      */
     private void summarizeCrawl(final MyCrawlerConfig config) {
 
+        if (crawlEndTime == null) {
+            crawlEndTime = System.currentTimeMillis();
+        }
+
+        // print summary stats
+        System.out.println("  Start: " + new Date(crawlStartTime));
+        System.out.println("   Stop: " + new Date(crawlEndTime));
+        System.out
+                .println("Elapsed: " + (crawlEndTime - crawlStartTime) + "ms");
+
         System.out.println("Total pages: " + MyCrawler.getTotalPages());
         System.out.println("Total errors: " + MyCrawler.getTotalErrors());
 
-        final String filename = getJsonFilename(config);
+        final String filename = config.getRunConfig().getOutputFolder() + "/"
+                + "crawled_" + fileTimestamp + ".json";
 
         // write the crawl-results for each url to a file in JSON format
         FileUtils.writeFileFromString(filename,
