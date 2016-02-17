@@ -68,6 +68,11 @@ public class MyCrawler extends WebCrawler {
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'XXX");
 
     /**
+     * The time that the HTTP request was made
+     */
+    private Long startTime;
+
+    /**
      * @return the host to be included in the crawl
      */
     public static String getIncludeHost() {
@@ -166,13 +171,14 @@ public class MyCrawler extends WebCrawler {
      *            the url to be recorded
      */
     private void recordVisit(final WebURL url, final int statusCode,
-            final String statusDescription) {
+            final String statusDescription, final long elapsed) {
 
         synchronized (visitedUrls) {
 
             final JsonObject json = new JsonObject();
             json.add("url", new JsonPrimitive(url.getURL()));
             json.add("datetime", new JsonPrimitive(sdf.format(new Date())));
+            json.add("elapsed", new JsonPrimitive(elapsed));
             json.add("status", new JsonPrimitive(statusCode));
             json.add("description", new JsonPrimitive(statusDescription));
 
@@ -219,10 +225,20 @@ public class MyCrawler extends WebCrawler {
     }
 
     @Override
+    protected WebURL handleUrlBeforeProcess(final WebURL curURL) {
+
+        this.startTime = new Date().getTime();
+
+        return super.handleUrlBeforeProcess(curURL);
+    }
+
+    @Override
     protected void handlePageStatusCode(final WebURL webUrl,
             final int statusCode, final String statusDescription) {
 
-        recordVisit(webUrl, statusCode, statusDescription);
+        final Long elapsed = new Date().getTime() - this.startTime;
+
+        recordVisit(webUrl, statusCode, statusDescription, elapsed);
 
         synchronized (MyCrawler.totalPages) {
             setTotalPages(getTotalPages() + 1);
@@ -236,11 +252,6 @@ public class MyCrawler extends WebCrawler {
             }
         }
 
-    }
-
-    @Override
-    protected WebURL handleUrlBeforeProcess(final WebURL curURL) {
-        return super.handleUrlBeforeProcess(curURL);
     }
 
     @Override
