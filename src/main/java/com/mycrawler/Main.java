@@ -206,7 +206,6 @@ public class Main {
     private void instanceMain(final String[] args) {
 
         if (args.length > 0) {
-
             try {
 
                 // load the configuration values

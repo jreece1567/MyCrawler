@@ -3,6 +3,7 @@
  */
 package com.mycrawler;
 
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -217,6 +218,7 @@ public class MyCrawler extends WebCrawler {
             return false;
         }
 
+        System.out.println(url.getURL());
         return true;
     }
 
@@ -279,6 +281,9 @@ public class MyCrawler extends WebCrawler {
     @Override
     protected void onUnhandledException(final WebURL webUrl, final Throwable e) {
 
+        if (e instanceof SocketTimeoutException) {
+            handlePageStatusCode(webUrl, 500, e.getLocalizedMessage());
+        }
         super.onUnhandledException(webUrl, e);
     }
 

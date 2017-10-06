@@ -13,7 +13,7 @@ crawlConfig:
   maxDepthOfCrawling: -1
   userAgentString: "crawler4j"
 # defaultHeaders: null
-  politenessDelay: 625
+  politenessDelay: 500 
   includeHttpsPages: true
   includeBinaryContentInCrawling: false
   processBinaryContentInCrawling: false
