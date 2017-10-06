@@ -9,12 +9,16 @@ mvn clean package
 ```
 
 ## Configuring
-Edit the mycrawler.yml file as needed.
+Edit the `mycrawler_aem_<xx>.yml` file as needed.
 
 ## Running
 From the project-folder:
 ```sh
-java -jar target/MyCrawler-0.0.1-SNAPSHOT.jar mycrawler.yml
+java -jar target/MyCrawler-0.0.1-SNAPSHOT.jar mycrawler_aem_<xx>.yml
+```
+or
+```
+./run_crawler.sh
 ```
 
 ## Frameworks
